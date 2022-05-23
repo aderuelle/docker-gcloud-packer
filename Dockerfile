@@ -14,13 +14,18 @@ ENV PACKER_BASEURL=https://releases.hashicorp.com/packer/${PACKER_VERSION}
 ENV PACKER_SUMS=packer_${PACKER_VERSION}_SHA256SUMS
 ENV PACKER_ZIP=packer_${PACKER_VERSION}_${PACKER_OS}_${PACKER_ARCH}.zip
 
+USER root
 RUN deluser --remove-home cloudsdk
+RUN ln -sf /google-cloud-sdk/bin/gcloud /bin/gcloud
 
+USER ${PACKER_USER}:${PACKER_GROUP}
+RUN gcloud config configurations create default
+
+USER root
 RUN addgroup -S ${PACKER_GROUP} && \
     adduser -S ${PACKER_USER} -G ${PACKER_GROUP} -h ${PACKER_HOME}
 
 WORKDIR ${TMPDIR}
-
 RUN curl -O ${PACKER_BASEURL}/${PACKER_ZIP}
 # Alpine sha256sum doesn't have long options --check and --status
 RUN curl ${PACKER_BASEURL}/${PACKER_SUMS} | grep ${PACKER_ZIP} | sha256sum -c -s && \
@@ -28,6 +33,5 @@ RUN curl ${PACKER_BASEURL}/${PACKER_SUMS} | grep ${PACKER_ZIP} | sha256sum -c -s
     rm ${PACKER_ZIP}
 
 WORKDIR ${PACKER_HOME}
-
 USER ${PACKER_USER}:${PACKER_GROUP}
 ENTRYPOINT [${ENTRYPOINT}]
