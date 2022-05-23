@@ -14,24 +14,34 @@ ENV PACKER_BASEURL=https://releases.hashicorp.com/packer/${PACKER_VERSION}
 ENV PACKER_SUMS=packer_${PACKER_VERSION}_SHA256SUMS
 ENV PACKER_ZIP=packer_${PACKER_VERSION}_${PACKER_OS}_${PACKER_ARCH}.zip
 
+# As root:
+# - Link gcloud in /bin
+# - remove cloudsdk user from cloud-sdk image
+# - add packer group & user
 USER root
-RUN deluser --remove-home cloudsdk
 RUN ln -sf /google-cloud-sdk/bin/gcloud /bin/gcloud
-
-USER ${PACKER_USER}:${PACKER_GROUP}
-RUN gcloud config configurations create default
-
-USER root
+RUN deluser --remove-home cloudsdk
 RUN addgroup -S ${PACKER_GROUP} && \
     adduser -S ${PACKER_USER} -G ${PACKER_GROUP} -h ${PACKER_HOME}
 
-WORKDIR ${TMPDIR}
+# As packer user:
+# - create default empty configuration
+USER ${PACKER_USER}:${PACKER_GROUP}
+RUN gcloud config configurations create default
+
+# As root:
+# - download packer executable zip archive
+# - inline check of sha256sum, decompression of packer in /bin and removal of zip file
+USER root
 RUN curl -O ${PACKER_BASEURL}/${PACKER_ZIP}
 # Alpine sha256sum doesn't have long options --check and --status
 RUN curl ${PACKER_BASEURL}/${PACKER_SUMS} | grep ${PACKER_ZIP} | sha256sum -c -s && \
     unzip ${PACKER_ZIP} -d ${PACKER_LOCATION} && \
     rm ${PACKER_ZIP}
 
+# - set workdir to packer home directory
+# - set default user & group to packer:packer
+# - set entry point
 WORKDIR ${PACKER_HOME}
 USER ${PACKER_USER}:${PACKER_GROUP}
 ENTRYPOINT [${ENTRYPOINT}]
