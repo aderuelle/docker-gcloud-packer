@@ -19,8 +19,6 @@ RUN deluser --remove-home cloudsdk
 RUN addgroup -S ${PACKER_GROUP} && \
     adduser -S ${PACKER_USER} -G ${PACKER_GROUP} -h ${PACKER_HOME}
 
-ADD .profile .
-
 WORKDIR ${TMPDIR}
 
 RUN curl -O ${PACKER_BASEURL}/${PACKER_ZIP}
@@ -30,6 +28,8 @@ RUN curl ${PACKER_BASEURL}/${PACKER_SUMS} | grep ${PACKER_ZIP} | sha256sum -c -s
     rm ${PACKER_ZIP}
 
 WORKDIR ${PACKER_HOME}
+
+ADD .profile .
 
 USER ${PACKER_USER}:${PACKER_GROUP}
 ENTRYPOINT [${ENTRYPOINT}]
