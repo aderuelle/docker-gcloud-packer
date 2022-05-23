@@ -2,20 +2,26 @@ FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
 LABEL maintainer="Alexis Deruelle <alexis.deruelle@gmail.com>"
 
 ARG PACKER_VERSION=1.8.0
+ARG PACKER_OS=linux
+ARG PACKER_ARCH=amd64
+ARG PACKER_USER=packer
+ARG PACKER_GROUP=${PACKER_USER}
+ARG PACKER_LOCATION=/bin
+ARG TMPDIR=/tmp
 ENV PACKER_BASEURL=https://releases.hashicorp.com/packer/${PACKER_VERSION}
-ENV SUMS_FILE=packer_${PACKER_VERSION}_SHA256SUMS
-ENV PACKER_ZIP=packer_${PACKER_VERSION}_linux_amd64.zip
+ENV PACKER_SUMS=packer_${PACKER_VERSION}_SHA256SUMS
+ENV PACKER_ZIP=packer_${PACKER_VERSION}_${PACKER_OS}_${PACKER_ARCH}.zip
 
-WORKDIR /tmp
+WORKDIR ${TMPDIR}
 
-RUN addgroup -S packer && adduser -S packer -G packer
-
-RUN apk add --update bash openssl
+RUN addgroup -S ${PACKER_GROUP} && \
+    adduser -S ${PACKER_USER} -G ${PACKER_GROUP}
 
 RUN curl -O ${PACKER_BASEURL}/${PACKER_ZIP}
+# Alpine sha256sum doesn't have long options --check and --status
+RUN curl ${PACKER_BASEURL}/${PACKER_SUMS} | grep ${PACKER_ZIP} | sha256sum -c -s && \
+    unzip ${PACKER_ZIP} -d ${PACKER_LOCATION} && \
+    rm ${PACKER_ZIP}
 
-RUN test $(sha256sum ${PACKER_ZIP}) = $(curl ${PACKER_BASEURL}/${PACKER_SUMS} | grep "${PACKER_ZIP}" | cut -d' ' -f1) \
-    && unzip "${PACKER_FILE}" -d /bin && rm "${PACKER_FILE}"
-
-USER packer:packer
-ENTRYPOINT ["/bin/packer"]
+USER ${PACKER_USER}:${PACKER_GROUP}
+ENTRYPOINT ["${PACKER_LOCATION}/packer"]
