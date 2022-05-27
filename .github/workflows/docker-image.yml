@@ -21,7 +21,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: aderuelle/docker-gcloud-packer
+          images: ghcr.io/aderuelle/docker-gcloud-packer
           tags: |
             type=ref,event=branch
             type=ref,event=pr
