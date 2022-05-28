@@ -22,6 +22,7 @@ SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 # - remove cloudsdk user from cloud-sdk image
 # - add packer group & user
 USER root
+
 RUN ln -sf /google-cloud-sdk/bin/gcloud /bin/gcloud && \
     deluser --remove-home cloudsdk && \
     addgroup -S ${PACKER_GROUP} && \
@@ -46,6 +47,9 @@ RUN curl -O ${PACKER_BASEURL}/${PACKER_ZIP} && \
     curl ${PACKER_BASEURL}/${PACKER_SUMS} | grep ${PACKER_ZIP} | sha256sum -c -s && \
     unzip ${PACKER_ZIP} -d ${PACKER_LOCATION} && \
     rm ${PACKER_ZIP}
+
+# - upgrade Alpine package & cleanup apk cache
+RUN apk -U upgrade && apk cache clean
 
 # - set workdir to packer home directory
 # - set default user & group to packer:packer
