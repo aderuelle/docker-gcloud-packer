@@ -28,7 +28,8 @@ RUN ln -sf /google-cloud-sdk/bin/gcloud /bin/gcloud && \
     adduser -S ${PACKER_USER} -G ${PACKER_GROUP} -h ${PACKER_HOME}
 
 RUN gcloud components list --format="value(id)" --filter="state.name!='Not Installed'  id!='core'" 2> /dev/null | \
-    xargs gcloud components remove --quiet && rm -rf /google-cloud-sdk/.install/.backup
+    xargs gcloud components remove --quiet && rm -rf /google-cloud-sdk/.install/.backup && \
+    rm -f /google-cloud-sdk/bin/anthoscli
 
 # As packer user:
 # - create default empty configuration
