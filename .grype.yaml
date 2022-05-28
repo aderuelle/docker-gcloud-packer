@@ -1,1 +1,2 @@
 add-cpes-if-none: true
+exclude: [/bin/packer]
