@@ -8,3 +8,9 @@
 Automatic builds of container images for Docker Hub
 
 Alpine based on the latest build of gcloud tool with specific version for Packer
+
+## Reference
+
+How to reduce image size on GCloud SDK based image [1]
+
+[1]: https://stackoverflow.com/questions/60827959/how-to-stop-gcloud-component-update-from-keeping-a-backup
