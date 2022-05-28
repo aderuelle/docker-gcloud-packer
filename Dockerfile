@@ -49,7 +49,7 @@ RUN curl -O ${PACKER_BASEURL}/${PACKER_ZIP} && \
     rm ${PACKER_ZIP}
 
 # - upgrade Alpine package & cleanup apk cache
-RUN apk -U upgrade && apk cache clean
+RUN apk -U upgrade
 
 # - set workdir to packer home directory
 # - set default user & group to packer:packer
