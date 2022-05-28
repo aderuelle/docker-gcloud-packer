@@ -28,6 +28,7 @@ RUN ln -sf /google-cloud-sdk/bin/gcloud /bin/gcloud && \
     addgroup -S ${PACKER_GROUP} && \
     adduser -S ${PACKER_USER} -G ${PACKER_GROUP} -h ${PACKER_HOME}
 
+# hadolint ignore=SC2046
 RUN gcloud components list --format="value(id)" --filter="state.name!='Not Installed'  id!='core'" 2> /dev/null | \
     xargs gcloud components remove --quiet && rm -rf /google-cloud-sdk/.install/.backup && \
     rm -rf $(find /google-cloud-sdk/ -regex ".*/__pycache__") && \
