@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Update Packer version to 1.8.1
 - Dockerfile: fixes for Hadolint reports
 - Add Hadolint and Anchore scan actions
 - README.md: add CI status badges

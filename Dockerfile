@@ -1,7 +1,7 @@
 FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
 LABEL maintainer="Alexis Deruelle <alexis.deruelle@gmail.com>"
 
-ARG PACKER_VERSION=1.8.0
+ARG PACKER_VERSION=1.8.1
 ARG PACKER_OS=linux
 ARG PACKER_ARCH=amd64
 ARG PACKER_USER=packer
