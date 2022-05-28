@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Remove GCloud SDK components to reduce attack surface
+- Remove GCloud SDK components to reduce attack surface/image size
 - Update Packer version to 1.8.1
 - Dockerfile: fixes for Hadolint reports
 - Add Hadolint and Anchore scan actions
@@ -28,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added CHANGELOG.md
 - Added GitHub Action: build & push to ghcr.io
 - Refactor by using variables for most things
-- Forked from https://github.com/arquivei/docker-gcloud-packer
+- Forked from <https://github.com/arquivei/docker-gcloud-packer>
 
 [docker/metadata-action@v4]: https://github.com/marketplace/actions/docker-metadata-action
 [Unreleased]: https://github.com/aderuelle/docker-gcloud-packer/compare/v0.1...HEAD
