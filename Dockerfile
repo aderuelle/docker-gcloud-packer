@@ -49,8 +49,9 @@ RUN curl -O ${PACKER_BASEURL}/${PACKER_ZIP} && \
     unzip ${PACKER_ZIP} -d ${PACKER_LOCATION} && \
     rm ${PACKER_ZIP}
 
-# - upgrade Alpine package & cleanup apk cache
-RUN apk -U upgrade
+# - upgrade Alpine packages & remove docker binary
+RUN apk -U upgrade && \
+    rm -f /usr/local/bin/docker
 
 # - set workdir to packer home directory
 # - set default user & group to packer:packer
