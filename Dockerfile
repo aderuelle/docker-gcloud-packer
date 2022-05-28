@@ -14,6 +14,9 @@ ENV PACKER_BASEURL=https://releases.hashicorp.com/packer/${PACKER_VERSION}
 ENV PACKER_SUMS=packer_${PACKER_VERSION}_SHA256SUMS
 ENV PACKER_ZIP=packer_${PACKER_VERSION}_${PACKER_OS}_${PACKER_ARCH}.zip
 
+# see https://github.com/hadolint/hadolint/wiki/DL4006
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+
 # As root:
 # - Link gcloud in /bin
 # - remove cloudsdk user from cloud-sdk image
