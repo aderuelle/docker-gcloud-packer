@@ -23,7 +23,6 @@ jobs:
         with:
           images: ghcr.io/aderuelle/docker-gcloud-packer
           tags: |
-            type=ref,event=branch
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
