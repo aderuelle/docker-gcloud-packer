@@ -22,6 +22,7 @@ RUN addgroup -g 1000 -S ${PACKER_GROUP} && \
     adduser -u 1000 -S ${PACKER_USER} -G ${PACKER_GROUP} -h ${PACKER_HOME}
 
 # Install prereq
+# hadolint ignore=DL3018
 RUN apk --no-cache -U upgrade && \
     apk --no-cache add \
     curl \
