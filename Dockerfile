@@ -1,4 +1,4 @@
-FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+FROM alpine:3.16
 LABEL maintainer="Alexis Deruelle <alexis.deruelle@gmail.com>"
 
 ARG PACKER_VERSION=1.8.1
@@ -17,45 +17,47 @@ ENV PACKER_ZIP=packer_${PACKER_VERSION}_${PACKER_OS}_${PACKER_ARCH}.zip
 # see https://github.com/hadolint/hadolint/wiki/DL4006
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
-# As root:
-# - Link gcloud in /bin
-# - remove cloudsdk user from cloud-sdk image
-# - add packer group & user
-USER root
+# Create packer group & user
+RUN addgroup -g 1000 -S ${PACKER_GROUP} && \
+    adduser -u 1000 -S ${PACKER_USER} -G ${PACKER_GROUP} -h ${PACKER_HOME}
 
-RUN ln -sf /google-cloud-sdk/bin/gcloud /bin/gcloud && \
-    deluser --remove-home cloudsdk && \
-    addgroup -S ${PACKER_GROUP} && \
-    adduser -S ${PACKER_USER} -G ${PACKER_GROUP} -h ${PACKER_HOME}
+# Install prereq
+RUN apk --no-cache -U upgrade && \
+    apk --no-cache add \
+    curl \
+    python3 \
+    py3-crcmod \
+    py3-openssl \
+    openssh-client
 
-# hadolint ignore=SC2046
-RUN gcloud components list --format="value(id)" --filter="state.name!='Not Installed'  id!='core'" 2> /dev/null | \
-    xargs gcloud components remove --quiet && rm -rf /google-cloud-sdk/.install/.backup && \
-    rm -rf $(find /google-cloud-sdk/ -regex ".*/__pycache__") && \
+# - download & install cloud sdk
+RUN curl https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.tar.gz | \
+    tar xz && \
+    ln -sf /google-cloud-sdk/bin/gcloud /bin/gcloud && \
+    gcloud components list --format="value(id)" --filter="state.name!='Not Installed'  id!='core'" 2> /dev/null | \
+    xargs -r gcloud components remove --quiet && \
+    rm -rf /google-cloud-sdk/.install/.backup && \
     rm -f /google-cloud-sdk/bin/anthoscli
 
-# As packer user:
-# - create default empty configuration
-USER ${PACKER_USER}:${PACKER_GROUP}
-RUN gcloud config configurations create default
-
-# As root:
 # - download packer executable zip archive
 # - inline check of sha256sum, decompression of packer in /bin and removal of zip file
-USER root
-# Alpine sha256sum doesn't have long options --check and --status
+#   Alpine sha256sum doesn't have long options --check and --status
 RUN curl -O ${PACKER_BASEURL}/${PACKER_ZIP} && \
     curl ${PACKER_BASEURL}/${PACKER_SUMS} | grep ${PACKER_ZIP} | sha256sum -c -s && \
     unzip ${PACKER_ZIP} -d ${PACKER_LOCATION} && \
     rm ${PACKER_ZIP}
 
-# - upgrade Alpine packages & remove docker binary
-RUN apk -U upgrade && \
-    rm -f /usr/local/bin/docker
+# As packer user:
+# - create default empty configuration
+USER ${PACKER_USER}:${PACKER_GROUP}
+RUN gcloud config configurations create default && \
+    gcloud config set core/disable_usage_reporting true && \
+    gcloud config set component_manager/disable_update_check true && \
+    gcloud --version
 
 # - set workdir to packer home directory
 # - set default user & group to packer:packer
 # - set entry point
 WORKDIR ${PACKER_HOME}
 USER ${PACKER_USER}:${PACKER_GROUP}
-ENTRYPOINT ["${ENTRYPOINT}"]
+ENTRYPOINT [${ENTRYPOINT}]
