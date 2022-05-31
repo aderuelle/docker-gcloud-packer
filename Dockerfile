@@ -61,4 +61,5 @@ RUN gcloud config configurations create default && \
 # - set entry point
 WORKDIR ${PACKER_HOME}
 USER ${PACKER_USER}:${PACKER_GROUP}
+# hadolint ignore=DL3025
 ENTRYPOINT [${ENTRYPOINT}]
