@@ -1,4 +1,4 @@
-FROM alpine:3.16
+FROM alpine:3.15
 LABEL maintainer="Alexis Deruelle <alexis.deruelle@gmail.com>"
 
 ARG PACKER_VERSION=1.8.1
